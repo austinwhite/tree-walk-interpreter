@@ -17,7 +17,6 @@ Scanner::Scanner(const std::string &source) : source(source) {}
 
 std::vector<Token> Scanner::scan_tokens() {
     while (!is_at_end()) {
-        // Invariant: All lexemes before current have been scanned
         start = current;
         scan_token();
     }
@@ -75,10 +74,10 @@ void Scanner::scan_token() {
         add_token(match('=') ? GREATER_EQUAL : GREATER);
         break;
     case '/':
-        if (match('/')) { // A '//' single-line comment
+        if (match('/')) {
             while (peek() != '\n' && !is_at_end())
                 advance();
-        } else if (match('*')) { // A /* multi-line comment
+        } else if (match('*')) {
             bool in_comment = true;
             while (in_comment && !is_at_end()) {
                 while (!match('*') && !is_at_end()) {
@@ -86,7 +85,6 @@ void Scanner::scan_token() {
                         line++;
                     advance();
                 }
-                // Matched a * - comment ends if we match a /
                 in_comment = !match('/');
             }
         } else {
@@ -96,14 +94,13 @@ void Scanner::scan_token() {
     case ' ':
     case '\r':
     case '\t':
-        // Ignore whitespace.
         break;
     case '\n':
         line++;
         break;
     case '"':
         string();
-        break; // string literals
+        break;
     default:
         if (is_digit(c)) {
             number();
@@ -133,7 +130,6 @@ bool Scanner::match(char expected) {
     return true;
 }
 
-// Lookahead method. Doesn't consume the character.
 char Scanner::peek() {
     if (is_at_end())
         return '\0';
@@ -147,16 +143,13 @@ void Scanner::string() {
         advance();
     }
 
-    // Unterminated string.
     if (is_at_end()) {
         Lox::error(line, "Unterminated string.");
         return;
     }
 
-    // The closing ".
     advance();
 
-    // Trim the surrounding quotes.
     int str_start = start + 1;
     std::string value = source.substr(str_start, current - 1 - str_start);
     add_token(STRING, value);
@@ -168,9 +161,8 @@ void Scanner::number() {
     while (is_digit(peek()))
         advance();
 
-    // Look for a fractional part.
     if (peek() == '.' && is_digit(peek_next())) {
-        advance(); // Consume the "."
+        advance();
         while (is_digit(peek()))
             advance();
     }
@@ -189,7 +181,6 @@ void Scanner::identifier() {
     while (is_alphanumeric(peek()))
         advance();
 
-    // See if the identifier is a reserved word.
     std::string text = source.substr(start, current - start);
 
     TokenType type = keywords.count(text) ? keywords.at(text) : IDENTIFIER;

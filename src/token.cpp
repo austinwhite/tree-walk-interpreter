@@ -14,9 +14,9 @@ static std::vector<std::string> token_names{
     "IDENTIFIER",    "STRING",      "NUMBER",
 
     "AND",           "CLASS",       "ELSE",       "FALSE",       "FUN",
-    "LAMBDA",        "FOR",         "IF",         "NIL",         "OR",
-    "PRINT",         "RETURN",      "SUPER",      "THIS",        "TRUE",
-    "VAR",           "WHILE",       "EOF"};
+    "FOR",           "IF",          "NIL",        "OR",          "PRINT",
+    "RETURN",        "SUPER",       "THIS",       "TRUE",        "VAR",
+    "WHILE",         "EOF"};
 
 Token::Token(TokenType type, const std::string &lexeme,
              const std::string &literal, int line)
